@@ -5,23 +5,29 @@ using UnityEngine;
 [RequireComponent(typeof(CharacterController))]
 public class PlayerMoveFPS : MonoBehaviour
 {
-    [Header("Mozgás beállítások")]
+    
     public Camera playerCamera;
     public float walkSpeed = 6f;
     public float runSpeed = 12f;
     public float jumpPower = 7f;
     public float gravity = 10f;
     public float dashSpeed = 50f;
+    public float dashTimer;
+    public float dashCoolDown;
     private int doubleJump = 0;
     
+    private bool isDashing = false;
+    public bool canDash = true;
+    public bool IsDashing => dashTimer > 0f;
     
-    [Header("Nézelődés beállítások")]
     public float lookSpeed = 2f;
     public float lookXLimit = 45f; // Korlátozza, mennyire nézhetünk fel vagy le (fok)
 
     public float cameraY; // A kamera alapértelmezett magasságának tárolására
     
     Vector3 moveDirection = Vector3.zero; // Ebben tároljuk a mozgás irányát és erejét
+    Vector3 dashDirection = Vector3.zero;
+    
     float rotationX = 0f; // A függőleges (fel-le) forgás aktuális értéke
     
     public bool canMove = true; // Ezzel globálisan letiltható a mozgás (pl. menüben)
@@ -40,17 +46,16 @@ public class PlayerMoveFPS : MonoBehaviour
 
     void Update()
     {
-        //Debug.Log( doubleJump );
         
-        #region Handles Movement
-        // Irányok lekérése a karakter helyi koordinátarendszere alapján (merre néz éppen)
+        #region Handles Movement & Dash
+        
+        dashTimer += Time.deltaTime;
+        
         Vector3 forward = transform.TransformDirection(Vector3.forward);
         Vector3 right = transform.TransformDirection(Vector3.right);
         
-        // Futás ellenőrzése: ha le van nyomva a Shift, a runSpeed-et használjuk
         bool isRunning = Input.GetKey(KeyCode.LeftShift);
         
-        // Sebesség kiszámítása tengelyenként (Vertical = előre/hátra, Horizontal = oldalra)
         float curSpeedX = canMove ? (isRunning ? runSpeed : walkSpeed) * Input.GetAxis("Vertical") : 0;
         // float curSpeedX;
         //
@@ -80,10 +85,8 @@ public class PlayerMoveFPS : MonoBehaviour
         //     curSpeedY = 0;
         
         
-        // Elmentjük az aktuális függőleges sebességet (gravitáció/ugrás), mielőtt felülírnánk az irányt
         float movementDirectionY = moveDirection.y;
         
-        // Összeadjuk az előre és oldalirányú mozgást
         moveDirection = (forward * curSpeedX) + (right * curSpeedY);
         
         #endregion
@@ -137,24 +140,11 @@ public class PlayerMoveFPS : MonoBehaviour
         #endregion
         
         
-        #region Handles Dash
+       
 
-        bool isDashing = Input.GetKey(KeyCode.LeftAlt);
         
         
         
-        //float dashDirection =  
-                            // TODO A Dasht megoldani :)))))) | Maybe tedd az egész mozgást egy else ágba 
-        if (isDashing)
-        {
-            
-            Debug.Log($"A dash lefutott | {isDashing}");
-            walkSpeed = dashSpeed;
-            isDashing = false;
-            Debug.Log($"Dash jelenlegi értéke : {isDashing}");
-            
-        }
-        walkSpeed = 6f;
-        #endregion
+        
     }
 }

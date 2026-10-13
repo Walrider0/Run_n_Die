@@ -1180,6 +1180,10 @@ MonoBehaviour:
   runSpeed: 12
   jumpPower: 7
   gravity: 10
+  dashSpeed: 50
+  dashTimer: 0
+  dashCoolDown: 0.5
+  canDash: 1
   lookSpeed: 2
   lookXLimit: 45
   cameraY: 0
