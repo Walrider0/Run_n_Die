@@ -1,0 +1,38 @@
+# Unity Library
+Library/
+Temp/
+Logs/
+obj/
+
+# Build folders
+Build/
+Builds/
+dist/
+
+# Visual Studio
+.vs/
+.vscode/
+*.csproj
+*.sln
+*.unityproj
+*.userprefs
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+
+# IDE
+*.swp
+*.swo
+*~
+
+# Assets meta files
+*.meta
+
+# Local user-specific files
+UserSettings/
