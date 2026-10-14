@@ -11,12 +11,13 @@ public class PlayerMoveFPS : MonoBehaviour
     public float runSpeed = 12f;
     public float jumpPower = 7f;
     public float gravity = 10f;
-    public float dashSpeed = 50f;
+    [SerializeField] public float dashSpeed = 50f;
+    [SerializeField] public float dashDuration = 0.15f;
+    [SerializeField] public float dashCooldown = 0.5f;
     public float dashTimer;
-    public float dashCoolDown;
+    public float cooldownTimer;
     private int doubleJump = 0;
     
-    private bool isDashing = false;
     public bool canDash = true;
     public bool IsDashing => dashTimer > 0f;
     
@@ -40,16 +41,41 @@ public class PlayerMoveFPS : MonoBehaviour
         characterController = GetComponent<CharacterController>();
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
-        
-        // Elmentjük a kamera induló magasságát
     }
 
     void Update()
     {
-        
         #region Handles Movement & Dash
+
+        do
+        {
+            if (cooldownTimer <= 0f)
+                break;
+            cooldownTimer -= Time.deltaTime;
+        } while (true);
         
-        dashTimer += Time.deltaTime;
+        Debug.Log(cooldownTimer);
+        if (Input.GetKeyDown(KeyCode.LeftAlt) && cooldownTimer <= 0f && !IsDashing)
+        {
+            Vector3 input = new Vector3(Input.GetAxis("Horizontal"), 0f, Input.GetAxis("Vertical")).normalized;
+            
+            dashDirection = input == Vector3.zero
+                ? transform.forward
+                : transform.TransformDirection(input);
+            
+            dashTimer = dashDuration;
+            cooldownTimer = dashDuration + dashCooldown;
+            Debug.Log("Dash Starts");
+
+        }
+
+        if (IsDashing)
+        {
+            characterController.Move(dashDirection * dashSpeed * Time.deltaTime);
+            dashTimer -= Time.deltaTime;
+            if (dashTimer <= 0f)
+                Debug.Log("Dasheltem");
+        }
         
         Vector3 forward = transform.TransformDirection(Vector3.forward);
         Vector3 right = transform.TransformDirection(Vector3.right);
@@ -57,38 +83,14 @@ public class PlayerMoveFPS : MonoBehaviour
         bool isRunning = Input.GetKey(KeyCode.LeftShift);
         
         float curSpeedX = canMove ? (isRunning ? runSpeed : walkSpeed) * Input.GetAxis("Vertical") : 0;
-        // float curSpeedX;
-        //
-        // if (canMove)
-        // {
-        //     if (isRunning)
-        //         curSpeedX = runSpeed * Input.GetAxis("Vertical");
-        //
-        //     else
-        //         curSpeedX = walkSpeed * Input.GetAxis("Vertical");
-        // }
-        // else
-        //     curSpeedX = 0;
-        
         
         float curSpeedY = canMove ? (isRunning ? runSpeed : walkSpeed) * Input.GetAxis("Horizontal") : 0;
-        // float curSpeedY;
-        //
-        // if (canMove)
-        // {
-        //     if (isRunning)
-        //         curSpeedY = runSpeed * Input.GetAxis("Vertical");
-        //     else
-        //         curSpeedY = walkSpeed * Input.GetAxis("Vertical");
-        // }
-        // else
-        //     curSpeedY = 0;
-        
         
         float movementDirectionY = moveDirection.y;
-        
         moveDirection = (forward * curSpeedX) + (right * curSpeedY);
+        moveDirection.y = movementDirectionY;
         
+        characterController.Move(moveDirection * Time.deltaTime);
         #endregion
         
         
@@ -96,7 +98,6 @@ public class PlayerMoveFPS : MonoBehaviour
         
         #region Handles Jumping
 
-        // Ugrás: ha nyomják a gombot, van engedély és a földön állunk
         if (Input.GetButtonDown("Jump") && canMove && doubleJump < 2)
         {
             moveDirection.y = jumpPower; // Felfelé irányuló erőt adunk neki
@@ -138,13 +139,6 @@ public class PlayerMoveFPS : MonoBehaviour
             transform.rotation *= Quaternion.Euler(0, Input.GetAxis("Mouse X") * lookSpeed, 0);
         }
         #endregion
-        
-        
-       
-
-        
-        
-        
         
     }
 }
