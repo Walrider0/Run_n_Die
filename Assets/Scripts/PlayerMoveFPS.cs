@@ -47,12 +47,8 @@ public class PlayerMoveFPS : MonoBehaviour
     {
         #region Handles Movement & Dash
 
-        do
-        {
-            if (cooldownTimer <= 0f)
-                break;
-            cooldownTimer -= Time.deltaTime;
-        } while (true);
+        cooldownTimer -= Time.deltaTime;
+        cooldownTimer = Mathf.Max(0f, cooldownTimer - Time.deltaTime);
         
         Debug.Log(cooldownTimer);
         if (Input.GetKeyDown(KeyCode.LeftAlt) && cooldownTimer <= 0f && !IsDashing)
@@ -64,7 +60,7 @@ public class PlayerMoveFPS : MonoBehaviour
                 : transform.TransformDirection(input);
             
             dashTimer = dashDuration;
-            cooldownTimer = dashDuration + dashCooldown;
+            cooldownTimer = dashDuration + dashCooldown + 7f;
             Debug.Log("Dash Starts");
 
         }
